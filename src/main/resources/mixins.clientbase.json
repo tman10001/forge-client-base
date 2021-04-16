@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "git.yagel15637.clientbase.impl.mixin",
+  "refmap": "mixins.clientbase.refmap.json",
+  "minVersion": "0.7.3",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "accessors.IMinecraft",
+    "mixins.MixinMinecraft"
+  ]
+}
