@@ -38,19 +38,19 @@ public final class ClientGUI extends MinecraftHUDGUI {
             @Override
             public void drawString(final Point pos, final String s, final Color c) {
                 end();
-                if (GUI.fontShadow.getValue()) mc.fontRenderer.drawStringWithShadow(s, pos.x, pos.y, c.getRGB());
-                else mc.fontRenderer.drawString(s, pos.x, pos.y, c.getRGB());
+                if (GUI.fontShadow.getValue()) mc.fontRenderer.drawStringWithShadow(s, pos.x + 2, pos.y + 2, c.getRGB());
+                else mc.fontRenderer.drawString(s, pos.x + 2, pos.y + 2, c.getRGB());
                 begin();
             }
 
             @Override
             public int getFontWidth(String s) {
-                return mc.fontRenderer.getStringWidth(s);
+                return mc.fontRenderer.getStringWidth(s) + 4;
             }
 
             @Override
             public int getFontHeight() {
-                return mc.fontRenderer.FONT_HEIGHT;
+                return mc.fontRenderer.FONT_HEIGHT + 4;
             }
         };
 
@@ -85,14 +85,24 @@ public final class ClientGUI extends MinecraftHUDGUI {
                 panel.addComponent(container);
 
                 for (final Setting<?> setting : feature.getSettings()) {
+                    if (setting == feature.enabled) continue;
+
                     if (setting instanceof Toggleable) container.addComponent(new BooleanComponent(setting.getId(), setting.getDescription(), theme.getComponentRenderer(), (Toggleable) setting));
                     else if (setting instanceof NumberSetting) container.addComponent(new NumberComponent(setting.getId(), setting.getDescription(), theme.getComponentRenderer(), (NumberSetting) setting, ((NumberSetting) setting).getMinimumValue(), ((NumberSetting) setting).getMaximumValue()));
                     else if (setting instanceof EnumSetting) container.addComponent(new EnumComponent(setting.getId(), setting.getDescription(), theme.getComponentRenderer(), (EnumSetting) setting));
                     else if (setting instanceof ColorSetting) container.addComponent(new ColorComponent(setting.getId(), setting.getDescription(), theme.getContainerRenderer(), new SettingsAnimation(GUI.animationSpeed), theme.getComponentRenderer(), (ColorSetting) setting, true, ((ColorSetting) setting).getRainbow(), new SimpleToggleable(false)));
                     else if (setting instanceof KeybindSetting) container.addComponent(new KeybindComponent(theme.getComponentRenderer(), (KeybindSetting) setting));
+                    else throw new IllegalStateException("Setting " + setting.getId() + " in feature " + feature.getId() + " is not a valid setting.");
                 }
             }
         }
+    }
+
+    @Override
+    public void onGuiClosed() {
+        super.onGuiClosed();
+
+        FeatureManager.INSTANCE.getFeature(GUI.class).enabled.setValue(false);
     }
 
     @Override

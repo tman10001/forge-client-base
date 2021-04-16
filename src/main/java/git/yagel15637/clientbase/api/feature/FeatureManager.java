@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import git.yagel15637.clientbase.ClientBase;
 import git.yagel15637.clientbase.api.event.events.KeybindPressedEvent;
 import git.yagel15637.clientbase.impl.feature.client.*;
+import git.yagel15637.clientbase.impl.feature.movement.Sprint;
 import git.yagel15637.clientbase.impl.feature.player.*;
 
 import java.util.Arrays;
@@ -16,6 +17,8 @@ public final class FeatureManager {
 
     private final List<Feature> features = Arrays.asList(
             new GUI(),
+
+            new Sprint(),
 
             new FastUse()
     );

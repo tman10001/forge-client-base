@@ -82,6 +82,8 @@ jar.manifest.attributes(
 shadowJar {
     dependencies {
         include(dependency('org.spongepowered:mixin'))
+        include(dependency('com.lukflug:panelstudio'))
+        include(dependency('com.lukflug:panelstudio-mc12'))
     }
 
     exclude 'dummyThing'

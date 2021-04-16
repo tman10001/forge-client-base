@@ -29,8 +29,6 @@ public final class GUI extends Feature {
 
     @Override
     protected void onEnable() {
-        mc.displayGuiScreen(ClientGUI.INSTANCE);
-
-        enabled.setValue(false);
+        ClientGUI.INSTANCE.enterGUI();
     }
 }

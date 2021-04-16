@@ -103,8 +103,13 @@ public class Feature {
         return Arrays.stream(this.getClass().getDeclaredFields())
                 .filter(it -> it.getType().isAssignableFrom(Setting.class))
                 .map(it -> {
-                    try { return (Setting<?>) it.get(this); }
-                    catch (IllegalAccessException e) { e.printStackTrace(); }
+                    try {
+                        System.out.println(it.getName());
+
+                        return (Setting<?>) it.get(this);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
 
                     return null;
                 }).filter(Objects::nonNull)
