@@ -1,11 +1,12 @@
 package git.yagel15637.clientbase.api.feature;
 
-import com.google.common.eventbus.Subscribe;
 import git.yagel15637.clientbase.ClientBase;
 import git.yagel15637.clientbase.api.event.events.KeybindPressedEvent;
 import git.yagel15637.clientbase.impl.feature.client.*;
 import git.yagel15637.clientbase.impl.feature.movement.Sprint;
 import git.yagel15637.clientbase.impl.feature.player.*;
+import me.zero.alpine.listener.EventHandler;
+import me.zero.alpine.listener.Listener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,20 +42,20 @@ public final class FeatureManager {
         throw new NoSuchElementException();
     }
 
-
-
     public List<Feature> getFeaturesByCategory(final FeatureCategory category) {
         return features.stream().filter(it -> it.category == category).collect(Collectors.toList());
     }
 
-    private FeatureManager() {
-        ClientBase.EVENT_BUS.register(this);
+    public void init() {
+        ClientBase.EVENT_BUS.subscribe(this);
+
+        features.forEach(feature -> feature.addSettings(feature.bind, feature.enabled, feature.hidden));
     }
 
-    @Subscribe
-    public void onKeyPressed(final KeybindPressedEvent event) {
-        features.forEach(it -> {
-            if (it.bind.getValue() == event.getKey()) it.enabled.setValue(!it.enabled.getValue());
-        });
-    }
+    @EventHandler
+    private final Listener<KeybindPressedEvent> onKeybindPressed = new Listener<>(event -> features.forEach(it -> {
+        if (it.bind.getValue() == event.getKey()) it.enabled.setValue(!it.enabled.getValue());
+    }));
+
+    private FeatureManager() {}
 }

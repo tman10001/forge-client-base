@@ -16,11 +16,11 @@ public final class EventProcessor {
 
     public void init() {
         MinecraftForge.EVENT_BUS.register(this);
-        ClientBase.EVENT_BUS.register(this);
+        ClientBase.EVENT_BUS.subscribe(this);
     }
 
     @SubscribeEvent
-    public void onPlayerTickEvent(final TickEvent.PlayerTickEvent event) {
+    public void onPlayerTick(final TickEvent.PlayerTickEvent event) {
         if (mc.player != null) ClientBase.EVENT_BUS.post(new UpdateEvent());
     }
 

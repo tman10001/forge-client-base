@@ -1,16 +1,17 @@
 package git.yagel15637.clientbase.api.mixin;
-
+;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.spongepowered.asm.launch.MixinBootstrap;
+import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.Mixins;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 public final class MixinLoader implements IFMLLoadingPlugin {
     public MixinLoader() {
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.clientbase.json");
+        MixinEnvironment.getDefaultEnvironment().setObfuscationContext("searge");
     }
 
     @Override
@@ -23,7 +24,6 @@ public final class MixinLoader implements IFMLLoadingPlugin {
         return null;
     }
 
-    @Nullable
     @Override
     public String getSetupClass() {
         return null;

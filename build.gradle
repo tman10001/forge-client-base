@@ -1,11 +1,11 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "https://files.minecraftforge.net/maven" }
+        maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
         classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
@@ -19,22 +19,22 @@ group = 'git.yagel15637'
 version = '1.0-SNAPSHOT'
 archivesBaseName = 'ClientBase'
 
+compileJava {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 minecraft {
     version = project.forgeVersion
-    runDir = "run"
-
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
+    runDir = 'run'
     mappings = project.mcpVersion
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    coreMod = 'git.yagel15637.clientbase.api.mixin.MixinLoader'
+    makeObfSourceJar = false
 }
 
 repositories {
     maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
     maven { url = 'https://lukflug.github.io/maven' }
+    maven { url = 'https://jitpack.io' }
 
     mavenCentral()
 }
@@ -47,24 +47,22 @@ dependencies {
         exclude module: 'commons-io'
     }
 
-    compile "com.lukflug:panelstudio:0.1.8"
-    compile "com.lukflug:panelstudio-mc12:0.1.8"
+    compile 'com.github.ZeroMemes:Alpine:1.5'
+    compile 'net.jodah:typetools:0.5.0'
+    compile 'com.lukflug:panelstudio:0.1.8'
+    compile 'com.lukflug:panelstudio-mc12:0.1.8'
 }
 
 processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', project.minecraft.version
 
-    // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include "mcmod.info"
+        include 'mcmod.info'
 
-        // replace version and mcversion
-        expand "version": project.version, "mcversion": project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
 
-    // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude "mcmod.info"
     }
@@ -75,12 +73,14 @@ jar.manifest.attributes(
         'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
         'TweakOrder': 0,
         'FMLCorePluginContainsFMLMod': true,
-        'FMLCorePlugin': 'git.yagel15637.api.mixin.MixinLoader',
+        'FMLCorePlugin': 'git.yagel15637.clientbase.api.mixin.MixinLoader',
         'ForceLoadAsMod': true
 )
 
 shadowJar {
     dependencies {
+        include(dependency('com.github.ZeroMemes:Alpine'))
+        include(dependency('net.jodah:typetools'))
         include(dependency('org.spongepowered:mixin'))
         include(dependency('com.lukflug:panelstudio'))
         include(dependency('com.lukflug:panelstudio-mc12'))
@@ -91,7 +91,16 @@ shadowJar {
     classifier = 'release'
 }
 
+reobf {
+    shadowJar {
+        mappingType = 'SEARGE'
+        classpath = sourceSets.main.compileClasspath
+    }
+}
+
 mixin {
     defaultObfuscationEnv searge
     add sourceSets.main, 'mixins.clientbase.refmap.json'
 }
+
+build.dependsOn(shadowJar)

@@ -8,10 +8,9 @@ import git.yagel15637.clientbase.api.setting.settings.KeybindSetting;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Feature {
     protected final String id = this.getClass().getSimpleName(), description;
@@ -32,7 +31,7 @@ public class Feature {
         this.description = description;
         this.category = category;
 
-        settings = findSettings();
+        settings = new ArrayList<>();
 
         bind.setValueCallback(v -> {
             if (v == Keyboard.KEY_DELETE) {
@@ -50,21 +49,23 @@ public class Feature {
             if (v) {
                 onEnable();
 
-                ClientBase.EVENT_BUS.register(this);
+                ClientBase.EVENT_BUS.subscribe(this);
             } else {
                 onDisable();
 
-                ClientBase.EVENT_BUS.unregister(this);
+                ClientBase.EVENT_BUS.unsubscribe(this);
             }
 
             return !alwaysEnabled || v;
         });
-
-        settings.addAll(Arrays.asList(bind, enabled, hidden));
     }
 
     protected Feature(final FeatureCategory category) {
         this("", category);
+    }
+
+    protected final void addSettings(final Setting<?>... settings) {
+        this.settings.addAll(Arrays.asList(settings));
     }
 
     protected void onEnable() {}
@@ -97,22 +98,5 @@ public class Feature {
 
     public final boolean isHiddenByDefault() {
         return hiddenByDefault;
-    }
-
-    private List<Setting<?>> findSettings() {
-        return Arrays.stream(this.getClass().getDeclaredFields())
-                .filter(it -> it.getType().isAssignableFrom(Setting.class))
-                .map(it -> {
-                    try {
-                        System.out.println(it.getName());
-
-                        return (Setting<?>) it.get(this);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-
-                    return null;
-                }).filter(Objects::nonNull)
-                .collect(Collectors.toList());
     }
 }
